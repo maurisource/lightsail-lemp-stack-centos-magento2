@@ -69,9 +69,9 @@ yum -y localinstall mysql57-community-release-el7-7.noarch.rpm
 yum -y install mysql-community-server
 
 # reset root password in mysql
-mv /var/lib/mysql /var/lib/mysql-`date +%s`
-mkdir /var/lib/mysql/
-chown mysql.mysql /var/lib/mysql
+bck_dir=/var/lib/mysql-`date +%s`
+mkdir $bck_dir
+mv /var/lib/mysql/* $bck_dir/
 mysqld --initialize-insecure --user=mysql
 
 # TODO: may need to add performance enhancements in my.cnf
