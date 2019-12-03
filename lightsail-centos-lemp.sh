@@ -97,32 +97,35 @@ chown nginx.nginx /var/www/html
 systemctl start php-fpm
 systemctl enable php-fpm
 
-# install mysql 5.7
 cd /root
-wget http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
-yum -y localinstall mysql57-community-release-el7-7.noarch.rpm
-yum -y install mysql-community-server
 
-# reset root password in mysql
-service mysqld stop
-ls -l /var/lib/mysql > /root/mysql-dir.lst
-bck_dir=/var/lib/mysql-`date +%s`
-mkdir $bck_dir
-mv /var/lib/mysql/* $bck_dir/
-mysqld --initialize-insecure --user=mysql
+# install mysql 5.7 (only if the data directory doesn't exist yet)
+if [ ! -d /var/lib/mysql ]; then
+  wget http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
+  yum -y localinstall mysql57-community-release-el7-7.noarch.rpm
+  yum -y install mysql-community-server
 
-# TODO: may need to add performance enhancements in my.cnf
+  # reset root password in mysql
+  service mysqld stop
+  ls -l /var/lib/mysql > /root/mysql-dir.lst
+  bck_dir=/var/lib/mysql-`date +%s`
+  mkdir $bck_dir
+  mv /var/lib/mysql/* $bck_dir/
+  mysqld --initialize-insecure --user=mysql
 
-# start mysql and add magento database and user (w/o password)
-service mysqld start
-systemctl enable mysqld
+  # TODO: may need to add performance enhancements in my.cnf
 
-mysql -u root <<SQL
-create database magento;
-create user magento;
-GRANT ALL PRIVILEGES ON magento.* TO magento;
-flush privileges;
-SQL
+  # start mysql and add magento database and user (w/o password)
+  service mysqld start
+  systemctl enable mysqld
+
+  mysql -u root <<SQL
+  create database magento;
+  create user magento;
+  GRANT ALL PRIVILEGES ON magento.* TO magento;
+  flush privileges;
+  SQL
+fi
 
 # install composer globally
 curl -s https://getcomposer.org/installer > /root/composer_installer.php
