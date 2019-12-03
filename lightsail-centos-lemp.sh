@@ -13,6 +13,9 @@ yum -y install nginx
 systemctl start nginx
 systemctl enable nginx
 
+# allow login as nginx
+usermod --shell /bin/bash nginx
+
 # install php 7.0
 # rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 # yum -y install php70w-fpm php70w
