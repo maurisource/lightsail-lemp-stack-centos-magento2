@@ -52,7 +52,7 @@ systemctl enable nginx
 yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum install -y yum-utils
 yum-config-manager --disable remi-php54
-yum-config-manager --enable remi-php$PHP_VERSION
+yum-config-manager --enable remi-php${PHP_VERSION//.}
 yum -y install php-fpm php
 yum -y install php-pdo php-mysqlnd php-opcache php-xml php-gd php-devel php-mysql php-intl php-mbstring php-bcmath php-json php-iconv php-soap php-pecl-zip
 
