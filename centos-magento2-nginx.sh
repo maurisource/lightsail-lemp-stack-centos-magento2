@@ -8,11 +8,13 @@
 # 4. Installs nginx site configuration file for port 80 and restarts nginx
 # It's supposed to be used after lightsail-centos-lemp.sh script, composer and
 # `magento setup:install` commands
-# MAGE_ROOT and MAGE_HOSTNAME variables should be changed accordingly before
-# running this script.
+# MAGE_ROOT and MAGE_HOSTNAME variables will be requested to be entered from
+# console.
 
-MAGE_ROOT=/var/www/html/mage
-MAGE_HOSTNAME=mage2.test-domain.com
+echo -n "Enter magento2 root dir (e.g. /var/www/html/magento) and press [ENTER] "
+read MAGE_ROOT
+echo -n "Enter domain name for this magento installation and press [ENTER] "
+read MAGE_HOSTNAME
 
 cd $MAGE_ROOT
 # bin/magento deploy:mode:set developer

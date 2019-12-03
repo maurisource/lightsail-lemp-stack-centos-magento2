@@ -3,6 +3,34 @@
 # Implements prerequisite steps from:
 # https://devdocs.magento.com/guides/v2.3/install-gde/prereq/nginx.html#centos-7
 
+# read command line params
+
+# default PHP version (7.3 may be requested by using
+# --php-version 7.3 command-line switch)
+PHP_VERSION=7.2 
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    --php-version)
+    if [ $2 == '7.3' ]; then
+      PHP_VERSION=7.3
+    fi
+    shift; # past argument
+    shift; # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+
 # install required tools
 yum -y install unzip wget
 
@@ -25,11 +53,12 @@ chown nginx.nginx /var/www/html
 # yum -y install php70w-pdo php70w-mysqlnd php70w-opcache php70w-xml php70w-gd php70w-devel php70w-mysql php70w-intl php70w-mbstring php70w-bcmath php70w-json php70w-iconv php70w-soap
 
 
-# install php 7.3
+# install php. 7.2 is the default, 7.3 can be requested by adding
+# --php-version 7.3 command line param.
 yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum install -y yum-utils
 yum-config-manager --disable remi-php54
-yum-config-manager --enable remi-php73
+yum-config-manager --enable remi-php${PHP_VERSION//.}
 yum -y install php-fpm php
 yum -y install php-pdo php-mysqlnd php-opcache php-xml php-gd php-devel php-mysql php-intl php-mbstring php-bcmath php-json php-iconv php-soap php-pecl-zip
 
