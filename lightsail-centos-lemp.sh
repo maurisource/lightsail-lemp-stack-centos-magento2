@@ -124,7 +124,7 @@ if [ ! -d /var/lib/mysql ]; then
   create user magento;
   GRANT ALL PRIVILEGES ON magento.* TO magento;
   flush privileges;
-  SQL
+SQL
 fi
 
 # install composer globally
