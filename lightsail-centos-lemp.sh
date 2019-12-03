@@ -41,12 +41,6 @@ yum -y install nginx
 systemctl start nginx
 systemctl enable nginx
 
-# allow login as nginx
-usermod --shell /bin/bash nginx
-
-# chown the target directory to nginx
-chown nginx.nginx /var/www/html
-
 # install php 7.0
 # rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 # yum -y install php70w-fpm php70w
@@ -92,6 +86,12 @@ mkdir -p /var/lib/php/session/
 chown -R nginx:nginx /var/lib/php/
 mkdir -p /run/php-fpm/
 chown -R nginx:nginx /run/php-fpm/
+
+# allow login as nginx
+usermod --shell /bin/bash nginx
+
+# chown the target directory to nginx
+chown nginx.nginx /var/www/html
 
 # start php-fpm
 systemctl start php-fpm
