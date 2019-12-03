@@ -21,8 +21,12 @@ cd $MAGE_ROOT
 
 find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
 find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-chown -R :nginx .
 bin/magento setup:di:compile
+
+curl -L -o n98-magerun.phar https://files.magerun.net/n98-magerun.phar
+chmod +x n98-magerun.phar
+
+chown -R :nginx .
 
 yum -y install policycoreutils-python
 semanage fcontext -a -t httpd_sys_rw_content_t "$MAGE_ROOT/app/etc(/.*)?"
