@@ -88,9 +88,9 @@ mkdir -p /run/php-fpm/
 chown -R nginx:nginx /run/php-fpm/
 
 # allow login as nginx and change home directory
-service php-fpm stop
+service nginx stop
 usermod --shell /bin/bash --home /var/www/html nginx
-service php-fpm start
+service nginx start
 
 # chown the target directory to nginx
 chown nginx.nginx /var/www/html
