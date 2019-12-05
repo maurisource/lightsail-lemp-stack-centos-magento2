@@ -30,7 +30,7 @@ case $key in
     shift; # past argument
     shift; # past value
     ;;
-    --domain_name)
+    --domain-name)
     DOMAIN_NAME=$2
     shift; # past argument
     shift; # past value
