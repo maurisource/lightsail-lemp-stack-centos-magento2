@@ -1,30 +1,34 @@
 #!/bin/bash
 
-# This script performs post-installation configuration of magento2 instance
-# created on centos LEMP platform:
-# 1. Adjusts directory/file ownership
-# 2. Compiles magento2 code
+# This script performs pre-installation configuration of directory and nginx
+# so that n98-magerun2 utility could be used to install magento2 in the
+# directory:
+# 1. Creates target directory and adjusts its permissions
+# 2. Installs n98-magerun2 utility globally
 # 3. Sets selinux access permissions
 # 4. Installs nginx site configuration file for port 80 and restarts nginx
-# It's supposed to be used after lightsail-centos-lemp.sh script, composer and
-# `magento setup:install` commands
-# MAGE_ROOT and MAGE_HOSTNAME variables will be requested to be entered from
-# console.
+# It's supposed to be used after lightsail-centos-lemp.sh script (and may be
+# executed automatically in some cases).
+# MAGE_ROOT and MAGE_HOSTNAME variables will be taken from first and second
+# command line param or requested to be entered from console if MAGE_ROOT is
+# missing.
 
-echo -n "Enter magento2 root dir (e.g. /var/www/html/magento) and press [ENTER] "
-read MAGE_ROOT
-echo -n "Enter domain name for this magento installation and press [ENTER] "
-read MAGE_HOSTNAME
+MAGE_ROOT=$1
+MAGE_HOSTNAME=$2
+if [ -z $MAGE_ROOT ]; then
+  echo -n "Enter magento2 root dir (e.g. /var/www/html/magento) and press [ENTER] "
+  read MAGE_ROOT
+  echo -n "Enter domain name for this magento installation and press [ENTER] "
+  read MAGE_HOSTNAME
+fi
 
-cd $MAGE_ROOT
-# bin/magento deploy:mode:set developer
+# create the target directory
+mkdir -p $MAGE_ROOT
+chown nginx.nginx $MAGE_ROOT
 
-find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
-find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-bin/magento setup:di:compile
-
-curl -L -o n98-magerun2.phar https://files.magerun.net/n98-magerun2.phar
-chmod +x n98-magerun2.phar
+# install magerun2 globally
+curl -L -o /usr/local/bin/n98-magerun2.phar https://files.magerun.net/n98-magerun2.phar
+chmod +x /usr/local/bin/n98-magerun2.phar
 
 chown -R :nginx .
 
@@ -35,7 +39,9 @@ semanage fcontext -a -t httpd_sys_rw_content_t "$MAGE_ROOT/pub/media(/.*)?"
 semanage fcontext -a -t httpd_sys_rw_content_t "$MAGE_ROOT/pub/static(/.*)?"
 restorecon -Rv "$MAGE_ROOT/"
 
-cat > /etc/nginx/conf.d/magento.conf << EOT
+# only install nginx virtual host if $MAGE_HOSTNAME is set
+if [ ! -z $MAGE_HOSTNAME ]; then
+  cat > /etc/nginx/conf.d/$MAGE_HOSTNAME.conf << EOT
 upstream fastcgi_backend {
   server  unix:/run/php-fpm/php-fpm.sock;
 }
@@ -48,4 +54,8 @@ server {
 }
 EOT
 
-service nginx restart
+  # restart nginx only if relevant configuration exists due to magento already
+  # being installed
+  [ -f $MAGE_ROOT/nginx.conf.sample ] && service nginx restart
+
+fi

@@ -9,6 +9,9 @@
 # --php-version 7.3 command-line switch)
 PHP_VERSION=7.2 
 
+MAGENTO_ROOT=
+DOMAIN_NAME=
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -19,6 +22,16 @@ case $key in
     if [ $2 == '7.3' ]; then
       PHP_VERSION=7.3
     fi
+    shift; # past argument
+    shift; # past value
+    ;;
+    --magento-root)
+    MAGENTO_ROOT=$2
+    shift; # past argument
+    shift; # past value
+    ;;
+    --domain_name)
+    DOMAIN_NAME=$2
     shift; # past argument
     shift; # past value
     ;;
@@ -133,3 +146,7 @@ fi
 curl -s https://getcomposer.org/installer > /root/composer_installer.php
 HOME=/root/ /bin/php /root/composer_installer.php --install-dir=/usr/bin --filename=composer > /root/composer_install.log 2>&1
 
+# call target directory creation if $MAGENTO_ROOT is set
+if [ ! -z $MAGENTO_ROOT ]; then
+  bash /root/lightsail-lemp-stack-centos-magento2/centos-magento2-nginx.sh $MAGENTO_ROOT $DOMAIN_NAME
+fi
