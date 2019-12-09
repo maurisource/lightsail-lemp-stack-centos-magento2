@@ -62,7 +62,7 @@ if [ ! -z $MAGE_HOSTNAME ]; then
   # magento is installed because it's dependent on nginx.conf.sample file from
   # magento installation).
   cat > /etc/nginx/conf.d/$MAGE_HOSTNAME.conf << EOT
-upstream fastcgi_backend {
+upstream fastcgi_backend_$MAGE_HOSTNAME {
   server  unix:/run/php-fpm/php-fpm-$MAGE_HOSTNAME.sock;
 }
 
