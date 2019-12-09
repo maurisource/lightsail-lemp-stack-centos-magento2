@@ -10,12 +10,15 @@
 #    the new virtual host
 # It's supposed to be used after lightsail-centos-lemp.sh script (and may be
 # executed automatically in some cases).
-# The following command are supposed to be called after magento installation:
-# 1. restorecon -Rv <magento_home>
-# 2. service nginx restart
+#
 # MAGE_ROOT and MAGE_HOSTNAME variables will be taken from first and second
 # command line param or requested to be entered from console if MAGE_ROOT is
 # missing.
+#
+# The following commands are supposed to be called as root after magento
+# installation is complete:
+# 1. restorecon -Rv <magento_home>
+# 2. service php-fpm restart; service nginx restart
 
 MAGE_ROOT=$1
 MAGE_HOSTNAME=$2
