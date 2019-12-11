@@ -6,8 +6,7 @@
 # 1. Creates target directory and adjusts its permissions
 # 2. Installs n98-magerun2 utility globally
 # 3. Sets selinux access permissions
-# 4. Installs nginx site configuration file for port 80 and php-fpm pool for
-#    the new virtual host
+# 4. Installs nginx site configuration file for port 80
 # It's supposed to be used after lightsail-centos-lemp.sh script (and may be
 # executed automatically in some cases).
 #
@@ -18,7 +17,7 @@
 # The following commands are supposed to be called as root after magento
 # installation is complete:
 # 1. restorecon -Rv <magento_home>
-# 2. service php-fpm restart; service nginx restart
+# 2. service nginx restart
 
 MAGE_ROOT=$1
 MAGE_HOSTNAME=$2
@@ -48,24 +47,10 @@ restorecon -Rv "$MAGE_ROOT/"
 
 # only install nginx virtual host if $MAGE_HOSTNAME is set
 if [ ! -z $MAGE_HOSTNAME ]; then
-  # create a separate php-fpm pool for the new site
-
-  # first check if www.conf.0 file exists to ensure lightsail-centos-lemp.sh
-  # already worked
-  if [ -f /etc/php-fpm.d/www.conf.0 ]; then
-    cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/$MAGE_HOSTNAME.conf
-    sed -i "s/\[www\]/[$MAGE_HOSTNAME]/g" /etc/php-fpm.d/$MAGE_HOSTNAME.conf
-    sed -i "s/listen\\s*=\\s*\\/run\\/php-fpm\\/php-fpm.sock/listen=\\/run\\/php-fpm\\/php-fpm-$MAGE_HOSTNAME.sock/g" /etc/php-fpm.d/$MAGE_HOSTNAME.conf
-  fi
-
   # add nginx virtual host for the new site (but it won't be functional before
   # magento is installed because it's dependent on nginx.conf.sample file from
   # magento installation).
   cat > /etc/nginx/conf.d/$MAGE_HOSTNAME.conf << EOT
-upstream fastcgi_backend_$MAGE_HOSTNAME {
-  server  unix:/run/php-fpm/php-fpm-$MAGE_HOSTNAME.sock;
-}
-
 server {
   listen 80;
   server_name $MAGE_HOSTNAME;

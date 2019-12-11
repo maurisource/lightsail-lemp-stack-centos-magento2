@@ -95,6 +95,14 @@ sed -i '/^listen.mode\s*=/s/=.*$/= 0660/g' /etc/php-fpm.d/www.conf
 
 sed -i '/^;env\[\(HOSTNAME\|PATH\|TMP\|TMPDIR\|TEMP\)\]/s/^;//g' /etc/php-fpm.d/www.conf
 
+# add php-fpm upstream into nginx main configuration file
+cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.0
+sed -i '/include \/etc\/nginx\/conf.d\/\*\.conf;/i \
+upstream fastcgi_backend {\
+  server  unix:/run/php-fpm/php-fpm.sock;\
+}\
+' /etc/nginx/nginx.conf
+
 mkdir -p /var/lib/php/session/
 chown -R nginx:nginx /var/lib/php/
 mkdir -p /run/php-fpm/
